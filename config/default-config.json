@@ -1,0 +1,16 @@
+{
+	"agent": {
+		"name": "AgileProcess Planner",
+		"commands": ["plan-backlog", "plan-feature", "plan-sprint"]
+	},
+	"agileCore": {
+		"baseUrl": "",
+		"apiKey": "",
+		"timeoutMs": 15000,
+		"endpoints": {
+			"planBacklog": "/api/planner/plan-backlog",
+			"planFeature": "/api/planner/plan-feature",
+			"planSprint": "/api/planner/plan-sprint"
+		}
+	}
+}
