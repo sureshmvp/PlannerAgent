@@ -13,6 +13,7 @@
     "cli": "ts-node src/cli.ts",
     "dev": "ts-node src/agent.ts",
     "start": "node dist/agent.js",
+    "validate-mcp": "ts-node src/validateMcpConnection.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

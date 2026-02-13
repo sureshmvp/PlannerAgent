@@ -21,7 +21,7 @@ async function main() {
   }
 
   const agent = await activateAgent();
-  const handler = agent.commands[command];
+  const handler = (agent.commands as Record<string, (input: any) => Promise<any>>)[command];
   if (!handler) {
     console.error(`Unknown command: ${command}`);
     process.exitCode = 1;
