@@ -12,8 +12,8 @@ type AzureDevOpsMcpConfig = {
 type McpConfigFileShape = Partial<AzureDevOpsMcpConfig>;
 
 function loadMcpConfigFile(): McpConfigFileShape {
-  const configPath = process.env.OPS360_AZURE_DEVOPS_MCP_CONFIG
-    ? path.resolve(process.cwd(), process.env.OPS360_AZURE_DEVOPS_MCP_CONFIG)
+  const configPath = process.env.AZURE_DEVOPS_MCP_CONFIG
+    ? path.resolve(process.cwd(), process.env.AZURE_DEVOPS_MCP_CONFIG)
     : path.resolve(process.cwd(), "mcp", "azure-devops.json");
 
   if (!fs.existsSync(configPath)) {
@@ -32,10 +32,10 @@ export function resolveAzureDevOpsMcpConfig(): AzureDevOpsMcpConfig {
   const fileConfig = loadMcpConfigFile();
 
   return {
-    serverUrl: process.env.OPS360_AZURE_DEVOPS_MCP_URL || fileConfig.serverUrl || "",
-    token: process.env.OPS360_AZURE_DEVOPS_MCP_TOKEN || fileConfig.token || "",
-    org: process.env.OPS360_AZURE_DEVOPS_ORG || fileConfig.org || "",
-    project: process.env.OPS360_AZURE_DEVOPS_PROJECT || fileConfig.project || ""
+    serverUrl: process.env.AZURE_DEVOPS_ORG_URL || fileConfig.serverUrl || "",
+    token: process.env.AZURE_DEVOPS_PAT || fileConfig.token || "",
+    org: process.env.AZURE_DEVOPS_ORG || fileConfig.org || "",
+    project: process.env.AZURE_DEVOPS_PROJECT || fileConfig.project || ""
   };
 }
 
@@ -128,14 +128,20 @@ async function createWorkItem(
   config: AzureDevOpsMcpConfig,
   args: Record<string, unknown>
 ) {
-  const { type = "User Story", title, description } = args;
+  const { type = "User Story", title, description, iterationPath } = args;
+
+  const patchOps: Array<{ op: string; path: string; value: unknown }> = [
+    { op: "add", path: "/fields/System.Title", value: title },
+    { op: "add", path: "/fields/System.Description", value: description || "" },
+  ];
+
+  if (iterationPath) {
+    patchOps.push({ op: "add", path: "/fields/System.IterationPath", value: iterationPath });
+  }
 
   const response = await client.post(
     `${config.org}/${config.project}/_apis/wit/workitems/$${type}`,
-    [
-      { op: "add", path: "/fields/System.Title", value: title },
-      { op: "add", path: "/fields/System.Description", value: description || "" }
-    ],
+    patchOps,
     {
       params: { "api-version": "7.0" },
       headers: { "Content-Type": "application/json-patch+json" }

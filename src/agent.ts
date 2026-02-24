@@ -1,6 +1,9 @@
 import dotenv from "dotenv";
 
 import { planBacklog } from "./handlers/planBacklog";
+import { createDevopsItems } from "./handlers/createDevopsItems";
+import { createBacklogItems } from "./handlers/createBacklogItems";
+import { createSprintItems } from "./handlers/createSprintItems";
 import { planFeature } from "./handlers/planFeature";
 import { planSprint } from "./handlers/planSprint";
 
@@ -79,6 +82,9 @@ async function routeCommand(
 
   // Handler registry
   const handlers: Record<string, (input: CommandInput) => Promise<any>> = {
+    "create-devops-items": createDevopsItems,
+    "create-backlog-items": createBacklogItems,
+    "create-sprint-items": createSprintItems,
     "plan-backlog": planBacklog,
     "plan-feature": planFeature,
     "plan-sprint": planSprint,
@@ -123,12 +129,21 @@ async function routeCommand(
   }
 }
 
-export async function activateAgent() {
+export async function activateAgent(): Promise<any> {
   console.log("AgileProcess Planner Ready!");
 
   return {
     routeCommand,
     commands: {
+      "create-devops-items": async (input: any) => {
+        return await createDevopsItems(input);
+      },
+      "create-backlog-items": async (input: any) => {
+        return await createBacklogItems(input);
+      },
+      "create-sprint-items": async (input: any) => {
+        return await createSprintItems(input);
+      },
       "plan-backlog": async (input: any) => {
         return await planBacklog(input);
       },

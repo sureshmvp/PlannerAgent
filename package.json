@@ -8,6 +8,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "cli": "ts-node src/cli.ts",
+    "go": "ts-node src/smartCli.ts",
     "dev": "ts-node src/agent.ts",
     "start": "node dist/agent.js",
     "validate-mcp": "ts-node src/validateMcpConnection.ts",
