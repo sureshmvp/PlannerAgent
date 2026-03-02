@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { microsoftGraphClient } from "../clients/microsoftGraphClient";
+import { getMicrosoftGraphMCPClient } from "../clients/microsoftGraphRealMcpClient";
 
 type UserGroupAssignment = {
   userPrincipalName: string;
@@ -127,11 +127,11 @@ function formatDoc(results: AssignmentResult[], generatedAt: string): string {
 }
 
 export async function assignUsersToGroups(args: Record<string, any>): Promise<any> {
-  if (!microsoftGraphClient.isConfigured()) {
+  if (!process.env.AZURE_TENANT_ID || !process.env.AZURE_CLIENT_ID || !process.env.AZURE_CLIENT_SECRET) {
     return {
       success: false,
       error:
-        "Microsoft Graph is not configured. Please set AZURE_TENANT_ID, AZURE_CLIENT_ID, and AZURE_CLIENT_SECRET environment variables."
+        "Microsoft Graph MCP is not configured. Please set AZURE_TENANT_ID, AZURE_CLIENT_ID, and AZURE_CLIENT_SECRET environment variables."
     };
   }
 
@@ -189,8 +189,9 @@ export async function assignUsersToGroups(args: Record<string, any>): Promise<an
   }
 
   const results: AssignmentResult[] = [];
+  const mcpClient = await getMicrosoftGraphMCPClient();
 
-  console.log(`\n🔄 Processing group assignments for ${assignments.length} user(s)...\n`);
+  console.log(`\n🔄 Processing group assignments for ${assignments.length} user(s) via MCP...\n`);
 
   for (const assignment of assignments) {
     const result: AssignmentResult = {
@@ -199,10 +200,15 @@ export async function assignUsersToGroups(args: Record<string, any>): Promise<an
     };
 
     try {
-      // Get user
-      const user = await microsoftGraphClient.getUser(assignment.userPrincipalName);
-      
-      if (!user) {
+      // Get user via MCP
+      let user: any = null;
+      try {
+        user = await mcpClient.callTool("get_user", { userId: assignment.userPrincipalName });
+      } catch {
+        // user not found
+      }
+
+      if (!user?.id) {
         console.log(`❌ User not found: ${assignment.userPrincipalName}`);
         assignment.groups.forEach((groupName) => {
           result.assignments.push({
@@ -218,9 +224,11 @@ export async function assignUsersToGroups(args: Record<string, any>): Promise<an
       result.userId = user.id;
       console.log(`\n👤 Processing user: ${assignment.userPrincipalName} (${user.id})`);
 
-      // Get user's existing groups
-      const existingGroups = await microsoftGraphClient.getUserGroups(user.id);
-      const existingGroupNames = new Set(existingGroups.map((g: any) => g.displayName));
+      // Get user's existing groups via MCP
+      const groupsResult = await mcpClient.callTool("get_user_groups", { userId: user.id });
+      const existingGroupNames = new Set(
+        (groupsResult?.value ?? []).map((g: any) => g.displayName as string)
+      );
 
       // Process each group assignment
       for (const groupName of assignment.groups) {
@@ -235,10 +243,10 @@ export async function assignUsersToGroups(args: Record<string, any>): Promise<an
             continue;
           }
 
-          // Find the group
-          const group = await microsoftGraphClient.getGroupByName(groupName);
-          
-          if (!group) {
+          // Find the group via MCP
+          const group = await mcpClient.callTool("get_group", { displayName: groupName });
+
+          if (!group?.id) {
             console.log(`   ❌ Group not found: ${groupName}`);
             result.assignments.push({
               groupName,
@@ -248,10 +256,10 @@ export async function assignUsersToGroups(args: Record<string, any>): Promise<an
             continue;
           }
 
-          // Add user to group
-          await microsoftGraphClient.addUserToGroup(user.id, group.id);
+          // Add user to group via MCP
+          await mcpClient.callTool("add_group_member", { groupId: group.id, userId: user.id });
           console.log(`   ✅ Added to group: ${groupName}`);
-          
+
           result.assignments.push({
             groupName,
             groupId: group.id,
@@ -261,7 +269,7 @@ export async function assignUsersToGroups(args: Record<string, any>): Promise<an
         } catch (err: any) {
           console.log(`   ❌ Failed to add to group: ${groupName}`);
           console.log(`      Error: ${err.message}`);
-          
+
           result.assignments.push({
             groupName,
             status: "failed",

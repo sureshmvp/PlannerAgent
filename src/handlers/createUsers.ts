@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { microsoftGraphClient } from "../clients/microsoftGraphClient";
+import { getMicrosoftGraphMCPClient } from "../clients/microsoftGraphRealMcpClient";
 
 type UserInput = {
   displayName: string;
@@ -150,11 +150,11 @@ function formatDoc(users: CreatedUser[], generatedAt: string): string {
 }
 
 export async function createUsers(args: Record<string, any>): Promise<any> {
-  if (!microsoftGraphClient.isConfigured()) {
+  if (!process.env.AZURE_TENANT_ID || !process.env.AZURE_CLIENT_ID || !process.env.AZURE_CLIENT_SECRET) {
     return {
       success: false,
       error:
-        "Microsoft Graph is not configured. Please set AZURE_TENANT_ID, AZURE_CLIENT_ID, and AZURE_CLIENT_SECRET environment variables or configure microsoftGraph in config/default-config.json."
+        "Microsoft Graph MCP is not configured. Please set AZURE_TENANT_ID, AZURE_CLIENT_ID, and AZURE_CLIENT_SECRET environment variables."
     };
   }
 
@@ -235,15 +235,21 @@ export async function createUsers(args: Record<string, any>): Promise<any> {
   }
 
   const createdUsers: CreatedUser[] = [];
+  const mcpClient = await getMicrosoftGraphMCPClient();
 
-  console.log(`\n🔄 Processing ${users.length} user(s)...\n`);
+  console.log(`\n🔄 Processing ${users.length} user(s) via MCP...\n`);
 
   for (const user of users) {
     try {
-      // Check if user already exists
-      const existingUser = await microsoftGraphClient.getUser(user.userPrincipalName);
-      
-      if (existingUser) {
+      // Check if user already exists via MCP
+      let existingUser: any = null;
+      try {
+        existingUser = await mcpClient.callTool("get_user", { userId: user.userPrincipalName });
+      } catch {
+        // 404 = user does not exist, proceed to create
+      }
+
+      if (existingUser?.id) {
         console.log(`⏭️  User ${user.userPrincipalName} already exists (ID: ${existingUser.id})`);
         createdUsers.push({
           id: existingUser.id,
@@ -254,25 +260,23 @@ export async function createUsers(args: Record<string, any>): Promise<any> {
         continue;
       }
 
-      // Create the user
+      // Create the user via MCP (flat payload — MCP server handles passwordProfile)
       const password = user.password || generatePassword();
-      const userData = {
-        displayName: user.displayName,
-        userPrincipalName: user.userPrincipalName,
-        mailNickname: user.mailNickname,
-        accountEnabled: user.accountEnabled !== false,
-        passwordProfile: {
-          forceChangePasswordNextSignIn: user.forceChangePasswordNextSignIn !== false,
-          password: password
-        },
-        ...(user.givenName && { givenName: user.givenName }),
-        ...(user.surname && { surname: user.surname }),
-        ...(user.jobTitle && { jobTitle: user.jobTitle }),
-        ...(user.department && { department: user.department }),
-        ...(user.usageLocation && { usageLocation: user.usageLocation })
+      const payload: Record<string, unknown> = {
+        displayName:                   user.displayName,
+        userPrincipalName:             user.userPrincipalName,
+        mailNickname:                  user.mailNickname,
+        accountEnabled:                user.accountEnabled !== false,
+        password,
+        forceChangePasswordNextSignIn: user.forceChangePasswordNextSignIn !== false,
       };
+      if (user.givenName)     payload["givenName"]     = user.givenName;
+      if (user.surname)       payload["surname"]       = user.surname;
+      if (user.jobTitle)      payload["jobTitle"]      = user.jobTitle;
+      if (user.department)    payload["department"]    = user.department;
+      if (user.usageLocation) payload["usageLocation"] = user.usageLocation;
 
-      const result = await microsoftGraphClient.createUser(userData);
+      const result = await mcpClient.callTool("create_user", payload);
 
       console.log(`✅ Created user: ${user.displayName} (${user.userPrincipalName})`);
       console.log(`   ID: ${result.id}`);

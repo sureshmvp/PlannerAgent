@@ -1,0 +1,7 @@
+{
+  "tenantId": "",
+  "clientId": "",
+  "clientSecret": "",
+  "scope": "https://graph.microsoft.com/.default",
+  "graphBaseUrl": "https://graph.microsoft.com/v1.0"
+}

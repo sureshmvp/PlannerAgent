@@ -12,6 +12,9 @@
     "dev": "ts-node src/agent.ts",
     "start": "node dist/agent.js",
     "validate-mcp": "ts-node src/validateMcpConnection.ts",
+    "validate-graph-mcp": "ts-node src/validateGraphMcpConnection.ts",
+    "test-mcp-protocol": "ts-node src/testMcpProtocol.ts",
+    "create-users-mcp": "ts-node src/createUsersViaMcp.ts",
     "create-users": "/usr/bin/python3 scripts/createAzureUsers.py",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -20,8 +23,12 @@
   "license": "ISC",
   "description": "AgileProcess Planner agent (AgilePlanner).",
   "dependencies": {
+    "@azure/identity": "^4.13.0",
+    "@microsoft/microsoft-graph-client": "^3.0.7",
+    "@modelcontextprotocol/sdk": "^1.27.1",
     "axios": "^1.13.5",
-    "dotenv": "^17.2.4"
+    "dotenv": "^17.2.4",
+    "isomorphic-fetch": "^3.0.0"
   },
   "devDependencies": {
     "@types/node": "^25.2.3",
