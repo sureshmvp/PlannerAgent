@@ -13,7 +13,10 @@ AgileProcess Planner agent for turning requirements, features, and sprint goals 
 ## Setup
 1. Install dependencies: `npm install`
 2. Copy and edit environment variables: `cp .env.example .env`
-3. Update config defaults in `config/default-config.json` (optional).
+3. Generate a local user file from the sample: `bash scripts/generate-users.sh`
+4. Update config defaults in `config/default-config.json` (optional).
+
+> **Security note:** `users.json` is excluded from git. Never commit files containing real email addresses, passwords, or tokens. See [SECURITY.md](SECURITY.md) for guidance.
 
 ## Configuration
 

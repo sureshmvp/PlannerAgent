@@ -26,3 +26,6 @@ Thumbs.db
 
 # Docs
 docs/mcp/azure-devops.json
+
+# User data - may contain real credentials; copy users.json.example to create this file locally
+users.json

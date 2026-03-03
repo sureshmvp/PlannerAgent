@@ -10,7 +10,6 @@
       "department": "Engineering",
       "usageLocation": "US",
       "accountEnabled": true,
-      "password": "TemporaryPassword123!",
       "forceChangePasswordNextSignIn": true,
       "groups": [
         "Engineering Team",
