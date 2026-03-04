@@ -118,7 +118,7 @@ def build_user_payload(user: dict) -> dict:
         "accountEnabled":    user.get("accountEnabled", True),
         "passwordProfile": {
             "forceChangePasswordNextSignIn": user.get("forceChangePasswordNextSignIn", True),
-            "password": user.get("password", "Welcome@2026!"),
+            "password": user.get("password", os.getenv("DEFAULT_USER_PASSWORD", "TempPass123!")),
         },
     }
 

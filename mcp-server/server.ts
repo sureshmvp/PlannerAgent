@@ -83,7 +83,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
           },
           password: {
             type: "string",
-            description: "Initial password (default: 'Welcome@2026!')",
+            description: "Initial password (required for user creation)",
           },
           givenName: { type: "string", description: "First name" },
           surname: { type: "string", description: "Last name" },
@@ -234,7 +234,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           mailNickname: args.mailNickname,
           accountEnabled: args.accountEnabled ?? true,
           passwordProfile: {
-            password: args.password ?? "Welcome@2026!",
+            password: args.password ?? process.env.DEFAULT_USER_PASSWORD ?? "TempUser123!",
             forceChangePasswordNextSignIn:
               args.forceChangePasswordNextSignIn ?? true,
           },

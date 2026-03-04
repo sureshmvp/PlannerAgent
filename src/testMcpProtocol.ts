@@ -14,7 +14,7 @@ const TEST_USER = {
   jobTitle: "MCP Protocol Tester",
   department: "Engineering",
   usageLocation: "US",
-  password: "Welcome@MCP2026!",
+  password: process.env.TEST_USER_PASSWORD || "McpTest123!",
   accountEnabled: true,
   forceChangePasswordNextSignIn: true,
 };

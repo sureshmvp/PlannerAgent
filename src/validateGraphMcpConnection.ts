@@ -18,7 +18,7 @@ const DEMO_USER = {
   department:               "Engineering",
   usageLocation:            "US",
   accountEnabled:           true,
-  password:                 "Welcome@Demo2026!",
+  password:                 process.env.DEMO_USER_PASSWORD || "DemoTest123!",
   forceChangePasswordNextSignIn: true,
 };
 

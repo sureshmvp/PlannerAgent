@@ -35,3 +35,5 @@ users.credentials.json
 .github
 
 mcp
+# Added by ggshield
+.cache_ggshield

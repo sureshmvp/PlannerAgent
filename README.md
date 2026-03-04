@@ -20,8 +20,10 @@ AgileProcess Planner agent for turning requirements, features, and sprint goals 
 
 ## Configuration
 
-### Azure AD / Microsoft Graph (for user management)
-Required environment variables:
+🔐 **All credentials must be configured via environment variables in `.env` file.**
+
+### Azure AD / Microsoft Graph (User Management)
+**Required environment variables:**
 - `AZURE_TENANT_ID` - Your Azure AD tenant ID
 - `AZURE_CLIENT_ID` - Service principal client ID with User.ReadWrite.All and Group.ReadWrite.All permissions
 - `AZURE_CLIENT_SECRET` - Service principal secret
@@ -29,15 +31,13 @@ Required environment variables:
 Optional:
 - `AZURE_GRAPH_SCOPE` (default: `https://graph.microsoft.com/.default`)
 
-### Azure DevOps (for work items and team management)
-Required environment variables:
+### Azure DevOps (Work Items & Team Management)
+**Required environment variables:**
 - `AZURE_DEVOPS_ORG_URL` - Your Azure DevOps organization URL (e.g., `https://dev.azure.com/yourorg`)
-- `AZURE_DEVOPS_ORG` - Your organization name
-- `AZURE_DEVOPS_PROJECT` - Your project name
 - `AZURE_DEVOPS_PAT` - Personal Access Token with appropriate permissions
 
-### AgileProcess Core (for planning features)
-Optional (for planning backlog, features, sprints):
+### AgileProcess Core (Planning Features)
+**Optional environment variables:**
 - `OPS360_AGILE_CORE_BASE_URL`
 - `OPS360_AGILE_CORE_API_KEY` (if required by the API)
 - `OPS360_AGILE_CORE_TIMEOUT_MS`
@@ -64,9 +64,12 @@ These handlers are available for Azure DevOps work items:
 
 ### Creating Azure AD Users
 
-1. Create a `users.json` file (see `users.json.example` for format):
+🔒 **Secure User Creation Process:**
+
+1. **Create a `users.json` file** with user definitions:
 ```json
 {
+  "_security_note": "For production: store passwords in users.credentials.json (git-ignored)",
   "users": [
     {
       "displayName": "John Doe",
@@ -76,6 +79,10 @@ These handlers are available for Azure DevOps work items:
       "surname": "Doe",
       "jobTitle": "Software Engineer",
       "department": "Engineering",
+      "passwordProfile": {
+        "password": "***HIDDEN***",
+        "forceChangePasswordNextSignIn": true
+      },
       "groups": ["Engineering Team"],
       "devOpsTeams": ["Development Team"]
     }
@@ -83,19 +90,59 @@ These handlers are available for Azure DevOps work items:
 }
 ```
 
-2. Create users:
+2. **For production: Create `users.credentials.json`** (git-ignored) with actual passwords:
+```json
+{
+  "credentials": [
+    {
+      "displayName": "John Doe",
+      "userPrincipalName": "john.doe@yourdomain.com",
+      "password": "YourSecurePassword123!"
+    }
+  ]
+}
+```
+
+2. **Create users securely:**
 ```bash
+# Using MCP protocol (recommended)
+npm run create-users-mcp users.json
+
+# Or using CLI
 npm run cli create-users --file users.json
 ```
 
-3. Assign users to Azure AD groups:
+3. **Validate setup:**
+```bash
+# Test Azure AD connection
+npm run validate-graph-mcp
+
+# Test MCP protocol
+npm run test-mcp-protocol
+```
+
+3. **Assign users to Azure AD groups:**
 ```bash
 npm run cli assign-users-to-groups --file users.json
 ```
 
-4. Assign users to Azure DevOps teams:
+4. **Assign users to Azure DevOps teams:**
 ```bash
 npm run cli assign-users-to-devops-teams --file users.json
+```
+
+## Validation & Testing
+
+**Security & Connection Validation:**
+```bash
+# Validate Azure AD/Microsoft Graph setup
+npm run validate-graph-mcp
+
+# Test MCP protocol functionality  
+npm run test-mcp-protocol
+
+# Validate Azure DevOps MCP connection
+npm run validate-mcp
 ```
 
 ### Creating Work Items
@@ -117,7 +164,7 @@ npm run cli create-sprint-items --file input.json --sprint "Sprint 1"
 All operations generate detailed markdown reports in the `docs/` folder:
 - `users-created-*.md` - User creation results with IDs and portal links
 - `group-assignments-*.md` - Azure AD group assignment results
-- `devops-team-assignments-*.md` - Azure DevOps team assignment results
+- `devops-team-assignments-*.md` - Azure DevOps team assignment results  
 - `backlog-created-*.md` - Work item creation summaries
 
 Public API contract is in contracts/agileprocess-core.openapi.yaml.

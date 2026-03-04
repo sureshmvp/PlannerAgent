@@ -193,7 +193,14 @@ async function main() {
     // Create via MCP
     try {
       // Extract password from passwordProfile or fallback to user.password
-      const passwordToUse = user.passwordProfile?.password || user.password || "Welcome@2026!";
+      const passwordToUse = user.passwordProfile?.password || user.password;
+      
+      if (!passwordToUse) {
+        console.error(`           ❌ No password specified for user: ${user.displayName}`);
+        failed++;
+        results.push({ upn: user.userPrincipalName, status: "failed" });
+        continue;
+      }
       const forceChangePassword = user.passwordProfile?.forceChangePasswordNextSignIn ?? 
                                   user.forceChangePasswordNextSignIn ?? 
                                   true;
