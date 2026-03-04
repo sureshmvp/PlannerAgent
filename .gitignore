@@ -28,7 +28,9 @@ Thumbs.db
 docs/mcp/azure-devops.json
 docs
 
-users.json
+
+# User credentials - contains sensitive email addresses and passwords
+users.credentials.json
 
 .github
 

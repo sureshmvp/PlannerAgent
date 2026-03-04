@@ -1,0 +1,251 @@
+{
+  "_comment": "Azure AD User Creation Structure",
+  "_note": "Actual userPrincipalName and passwords are stored in users.credentials.json (git-ignored)",
+  "_azureADInfo": {
+    "requiredFields": ["displayName", "userPrincipalName", "mailNickname", "accountEnabled", "passwordProfile"],
+    "optionalFields": ["givenName", "surname", "jobTitle", "department", "usageLocation"],
+    "postCreationSteps": "The 'groups' field is metadata. Group assignments must be done separately after user creation using Microsoft Graph API /groups/{id}/members endpoint."
+  },
+  "users": [
+    {
+      "displayName": "Tom Baker",
+      "userPrincipalName": "***HIDDEN***",
+      "mailNickname": "tomBaker",
+      "givenName": "Tom",
+      "surname": "Baker",
+      "jobTitle": "Product Dad – Sets Goals",
+      "department": "Baker Family",
+      "usageLocation": "US",
+      "accountEnabled": true,
+      "passwordProfile": {
+        "password": "***HIDDEN***",
+        "forceChangePasswordNextSignIn": true
+      },
+      "groups": ["Baker Family", "Leadership Team"]
+    },
+    {
+      "displayName": "Kate Baker",
+      "userPrincipalName": "***HIDDEN***",
+      "mailNickname": "kateBaker",
+      "givenName": "Kate",
+      "surname": "Baker",
+      "jobTitle": "Coach Mom – Removes Blockers",
+      "department": "Baker Family",
+      "usageLocation": "US",
+      "accountEnabled": true,
+      "passwordProfile": {
+        "password": "***HIDDEN***",
+        "forceChangePasswordNextSignIn": true
+      },
+      "groups": ["Baker Family", "Leadership Team"]
+    },
+    {
+      "displayName": "Nora Baker",
+      "userPrincipalName": "***HIDDEN***",
+      "mailNickname": "noraBaker",
+      "givenName": "Nora",
+      "surname": "Baker",
+      "jobTitle": "Meal Planner – Decides What",
+      "department": "Baker Family",
+      "usageLocation": "US",
+      "accountEnabled": true,
+      "passwordProfile": {
+        "password": "***HIDDEN***",
+        "forceChangePasswordNextSignIn": true
+      },
+      "groups": ["Baker Family", "Product Team"]
+    },
+    {
+      "displayName": "Charlie Baker",
+      "userPrincipalName": "***HIDDEN***",
+      "mailNickname": "charlieBaker",
+      "givenName": "Charlie",
+      "surname": "Baker",
+      "jobTitle": "Head Chef – Builds & Designs Dishes",
+      "department": "Baker Family",
+      "usageLocation": "US",
+      "accountEnabled": true,
+      "passwordProfile": {
+        "password": "***HIDDEN***",
+        "forceChangePasswordNextSignIn": true
+      },
+      "groups": ["Baker Family", "Engineering Team"]
+    },
+    {
+      "displayName": "Lorraine Baker",
+      "userPrincipalName": "***HIDDEN***",
+      "mailNickname": "lorraineBaker",
+      "givenName": "Lorraine",
+      "surname": "Baker",
+      "jobTitle": "Interior Decorator – Designs Experience",
+      "department": "Baker Family",
+      "usageLocation": "US",
+      "accountEnabled": true,
+      "passwordProfile": {
+        "password": "***HIDDEN***",
+        "forceChangePasswordNextSignIn": true
+      },
+      "groups": ["Baker Family", "UX Team"]
+    },
+    {
+      "displayName": "Henry Baker",
+      "userPrincipalName": "***HIDDEN***",
+      "mailNickname": "henryBaker",
+      "givenName": "Henry",
+      "surname": "Baker",
+      "jobTitle": "Recipe Crafter – Writes Instructions",
+      "department": "Baker Family",
+      "usageLocation": "US",
+      "accountEnabled": true,
+      "passwordProfile": {
+        "password": "***HIDDEN***",
+        "forceChangePasswordNextSignIn": true
+      },
+      "groups": ["Baker Family", "Engineering Team"]
+    },
+    {
+      "displayName": "Sarah Baker",
+      "userPrincipalName": "***HIDDEN***",
+      "mailNickname": "sarahBaker",
+      "givenName": "Sarah",
+      "surname": "Baker",
+      "jobTitle": "Food Taster – QA/Testing",
+      "department": "Baker Family",
+      "usageLocation": "US",
+      "accountEnabled": true,
+      "passwordProfile": {
+        "password": "***HIDDEN***",
+        "forceChangePasswordNextSignIn": true
+      },
+      "groups": ["Baker Family", "QA Team"]
+    },
+    {
+      "displayName": "Jake Baker",
+      "userPrincipalName": "***HIDDEN***",
+      "mailNickname": "jakeBaker",
+      "givenName": "Jake",
+      "surname": "Baker",
+      "jobTitle": "Kitchen Ops Guru – DevOps",
+      "department": "Baker Family",
+      "usageLocation": "US",
+      "accountEnabled": true,
+      "passwordProfile": {
+        "password": "***HIDDEN***",
+        "forceChangePasswordNextSignIn": true
+      },
+      "groups": ["Baker Family", "DevOps Team"]
+    },
+    {
+      "displayName": "Mark Baker",
+      "userPrincipalName": "***HIDDEN***",
+      "mailNickname": "markBaker",
+      "givenName": "Mark",
+      "surname": "Baker",
+      "jobTitle": "Pantry Manager – Cloud & Infrastructure",
+      "department": "Baker Family",
+      "usageLocation": "US",
+      "accountEnabled": true,
+      "passwordProfile": {
+        "password": "***HIDDEN***",
+        "forceChangePasswordNextSignIn": true
+      },
+      "groups": ["Baker Family", "Cloud Team"]
+    },
+    {
+      "displayName": "Jessica Baker",
+      "userPrincipalName": "***HIDDEN***",
+      "mailNickname": "jessicaBaker",
+      "givenName": "Jessica",
+      "surname": "Baker",
+      "jobTitle": "Home Security Officer – Security",
+      "department": "Baker Family",
+      "usageLocation": "US",
+      "accountEnabled": true,
+      "passwordProfile": {
+        "password": "***HIDDEN***",
+        "forceChangePasswordNextSignIn": true
+      },
+      "groups": ["Baker Family", "Security Team"]
+    },
+    {
+      "displayName": "Kim Baker",
+      "userPrincipalName": "***HIDDEN***",
+      "mailNickname": "kimBaker",
+      "givenName": "Kim",
+      "surname": "Baker",
+      "jobTitle": "Couponer & Recipe Finder – Data/AI",
+      "department": "Baker Family",
+      "usageLocation": "US",
+      "accountEnabled": true,
+      "passwordProfile": {
+        "password": "***HIDDEN***",
+        "forceChangePasswordNextSignIn": true
+      },
+      "groups": ["Baker Family", "Data Team"]
+    },
+    {
+      "displayName": "Mike Baker",
+      "userPrincipalName": "***HIDDEN***",
+      "mailNickname": "mikeBaker",
+      "givenName": "Mike",
+      "surname": "Baker",
+      "jobTitle": "Travel Planner – Mobile/Apps",
+      "department": "Baker Family",
+      "usageLocation": "US",
+      "accountEnabled": true,
+      "passwordProfile": {
+        "password": "***HIDDEN***",
+        "forceChangePasswordNextSignIn": true
+      },
+      "groups": ["Baker Family", "App Team"]
+    },
+    {
+      "displayName": "Nigel Baker",
+      "userPrincipalName": "***HIDDEN***",
+      "mailNickname": "nigelBaker",
+      "givenName": "Nigel",
+      "surname": "Baker",
+      "jobTitle": "Gadget Tester – Automation",
+      "department": "Baker Family",
+      "usageLocation": "US",
+      "accountEnabled": true,
+      "passwordProfile": {
+        "password": "***HIDDEN***",
+        "forceChangePasswordNextSignIn": true
+      },
+      "groups": ["Baker Family", "Automation Team"]
+    },
+    {
+      "displayName": "Kyle Baker",
+      "userPrincipalName": "***HIDDEN***",
+      "mailNickname": "kyleBaker",
+      "givenName": "Kyle",
+      "surname": "Baker",
+      "jobTitle": "Problem Solver – Support",
+      "department": "Baker Family",
+      "usageLocation": "US",
+      "accountEnabled": true,
+      "passwordProfile": {
+        "password": "***HIDDEN***",
+        "forceChangePasswordNextSignIn": true
+      },
+      "groups": ["Baker Family", "Support Team"]
+    },
+    {
+      "displayName": "Dadi Baker",
+      "userPrincipalName": "***HIDDEN***",
+      "mailNickname": "dadiBaker",
+      "givenName": "Dadi",
+      "surname": "Baker",
+      "jobTitle": "Family Elder – Portfolio Adviser",
+      "department": "Baker Family",
+      "usageLocation": "US",
+      "accountEnabled": true,
+      "passwordProfile": {
+        "password": "***HIDDEN***",
+        "forceChangePasswordNextSignIn": true
+      },
+      "groups": ["Baker Family", "Advisory Board"]
+    }
+  ]
+}

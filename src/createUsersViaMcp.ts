@@ -20,12 +20,26 @@ interface UserDefinition {
   department?: string;
   usageLocation?: string;
   accountEnabled?: boolean;
+  passwordProfile?: {
+    password: string;
+    forceChangePasswordNextSignIn?: boolean;
+  };
   password?: string;
   forceChangePasswordNextSignIn?: boolean;
 }
 
 interface UsersFile {
   users: UserDefinition[];
+}
+
+interface CredentialEntry {
+  displayName: string;
+  userPrincipalName: string;
+  password: string;
+}
+
+interface CredentialsFile {
+  credentials: CredentialEntry[];
 }
 
 // ─── Load users.json ──────────────────────────────────────────────────────────
@@ -53,7 +67,48 @@ function loadUsersFile(): UserDefinition[] {
     }
 
     console.log(`  📂 Loaded ${parsed.users.length} user(s) from: ${filePath}`);
-    return parsed.users;
+
+    // Load credentials file
+    const credentialsPath = path.resolve(process.cwd(), "users.credentials.json");
+    let credentials: CredentialEntry[] = [];
+
+    if (fs.existsSync(credentialsPath)) {
+      try {
+        const credRaw = fs.readFileSync(credentialsPath, "utf8");
+        const credParsed: CredentialsFile = JSON.parse(credRaw);
+        credentials = credParsed.credentials;
+        console.log(`  🔐 Loaded credentials from: users.credentials.json`);
+      } catch (err) {
+        console.error(`  ⚠️  Warning: Failed to load credentials from users.credentials.json`);
+        console.error(`     ${err}`);
+      }
+    } else {
+      console.log(`  ℹ️  No users.credentials.json found — using data from users.json as-is`);
+    }
+
+    // Merge credentials into users
+    const mergedUsers = parsed.users.map(user => {
+      const cred = credentials.find(c => c.displayName === user.displayName);
+      
+      if (cred) {
+        // Replace hidden values with actual credentials
+        const merged = { ...user };
+        if (user.userPrincipalName === "***HIDDEN***") {
+          merged.userPrincipalName = cred.userPrincipalName;
+        }
+        if (user.passwordProfile?.password === "***HIDDEN***") {
+          merged.passwordProfile = {
+            ...user.passwordProfile,
+            password: cred.password
+          };
+        }
+        return merged;
+      }
+      
+      return user;
+    });
+
+    return mergedUsers;
   } catch (err) {
     console.error(`  ❌ Failed to parse JSON: ${filePath}`);
     console.error(`     ${err}`);
@@ -68,8 +123,15 @@ function validateUser(user: UserDefinition, index: number): string[] {
   if (!user.displayName)        errors.push("missing 'displayName'");
   if (!user.userPrincipalName)  errors.push("missing 'userPrincipalName'");
   if (!user.mailNickname)       errors.push("missing 'mailNickname'");
+  if (user.userPrincipalName === "***HIDDEN***")
+    errors.push("'userPrincipalName' is still hidden — ensure users.credentials.json exists");
   if (!user.userPrincipalName?.includes("@"))
     errors.push("'userPrincipalName' must be a valid email");
+  
+  const password = user.passwordProfile?.password || user.password;
+  if (password === "***HIDDEN***")
+    errors.push("'password' is still hidden — ensure users.credentials.json exists");
+  
   return errors.map(e => `  User[${index + 1}] (${user.displayName || "?"}): ${e}`);
 }
 
@@ -130,13 +192,19 @@ async function main() {
 
     // Create via MCP
     try {
+      // Extract password from passwordProfile or fallback to user.password
+      const passwordToUse = user.passwordProfile?.password || user.password || "Welcome@2026!";
+      const forceChangePassword = user.passwordProfile?.forceChangePasswordNextSignIn ?? 
+                                  user.forceChangePasswordNextSignIn ?? 
+                                  true;
+
       const payload: Record<string, unknown> = {
         displayName:                   user.displayName,
         userPrincipalName:             user.userPrincipalName,
         mailNickname:                  user.mailNickname,
         accountEnabled:                user.accountEnabled ?? true,
-        password:                      user.password ?? "Welcome@2026!",
-        forceChangePasswordNextSignIn: user.forceChangePasswordNextSignIn ?? true,
+        password:                      passwordToUse,
+        forceChangePasswordNextSignIn: forceChangePassword,
       };
 
       if (user.givenName)    payload["givenName"]    = user.givenName;
